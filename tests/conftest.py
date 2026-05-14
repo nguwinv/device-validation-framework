@@ -4,7 +4,8 @@ from utils.driver import get_driver
 
 @pytest.fixture
 def driver():
-    driver = get_driver(headless=False)
+    headless = bool(os.environ.get("CI"))
+    driver = get_driver(headless=headless)
     yield driver
     driver.quit()
 

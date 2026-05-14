@@ -1,6 +1,4 @@
 from flask import Flask, render_template_string
-import random
-import time
 
 app = Flask(__name__)
 
@@ -60,76 +58,155 @@ HTML = """
   <meta charset="UTF-8">
   <title>Tesla Device Validation Dashboard</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', monospace;
-      background: #050508;
-      color: #ccc;
-      padding: 40px 32px;
-    }
-    header { margin-bottom: 36px; }
-    .label {
-      font-size: 10px;
-      letter-spacing: 4px;
-      color: #333;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    h1 { font-size: 28px; font-weight: 900; color: #fff; }
-    h1 span { color: #CC0000; }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-    .session-bar {
-      display: flex;
-      gap: 32px;
-      margin-bottom: 36px;
-      padding: 16px 20px;
-      background: #0A0A10;
-      border: 1px solid #1A1A2A;
-      border-radius: 8px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #EEF4FB;
+      color: #2D3748;
+      padding: 40px 36px;
+      min-height: 100vh;
     }
-    .session-bar .stat-label {
+
+    header {
+      margin-bottom: 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #93AECB;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: #1A2E4A;
+    }
+
+    h1 span { color: #3B82F6; }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #DBEAFE;
+      border: 1px solid #BFDBFE;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1D4ED8;
+      letter-spacing: 1px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3B82F6;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Session Stats */
+    .session-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #DBEAFE;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 4px rgba(59,130,246,0.06);
+    }
+
+    .stat-label {
       font-size: 10px;
-      color: #444;
       letter-spacing: 2px;
+      color: #93AECB;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A2E4A;
+    }
+
+    .stat-value.good { color: #059669; }
+    .stat-value.warn { color: #D97706; }
+    .stat-value.bad { color: #DC2626; }
+
+    /* Section Title */
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #93AECB;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    /* Device Cards */
+    .devices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .device-card {
+      background: #fff;
+      border: 1px solid #DBEAFE;
+      border-radius: 12px;
+      padding: 18px 24px;
+      display: grid;
+      grid-template-columns: 220px 1fr 1fr 1fr 1fr 120px;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 4px rgba(59,130,246,0.05);
+      transition: box-shadow 0.2s;
+    }
+
+    .device-card:hover { box-shadow: 0 4px 12px rgba(59,130,246,0.1); }
+    .device-card.synced { border-left: 4px solid #10B981; }
+    .device-card.degraded { border-left: 4px solid #F59E0B; }
+    .device-card.offline { border-left: 4px solid #EF4444; opacity: 0.7; }
+
+    .device-id { font-weight: 700; font-size: 15px; color: #1A2E4A; }
+    .device-type { font-size: 12px; color: #93AECB; margin-top: 2px; }
+
+    .metric-label {
+      font-size: 10px;
+      color: #93AECB;
+      letter-spacing: 1px;
       text-transform: uppercase;
       margin-bottom: 4px;
     }
-    .session-bar .stat-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .session-bar .stat-value.good { color: #00FF9C; }
-    .session-bar .stat-value.warn { color: #FFD93D; }
-    .session-bar .stat-value.bad { color: #FF6B6B; }
 
-    .devices { display: flex; flex-direction: column; gap: 12px; }
-
-    .device-card {
-      padding: 18px 20px;
-      background: #080810;
-      border: 1px solid #1A1A2A;
-      border-radius: 8px;
-      display: grid;
-      grid-template-columns: 200px 1fr 1fr 1fr 1fr 100px;
-      align-items: center;
-      gap: 16px;
-    }
-    .device-card.synced { border-left: 3px solid #00FF9C; }
-    .device-card.degraded { border-left: 3px solid #FFD93D; }
-    .device-card.offline { border-left: 3px solid #FF6B6B; opacity: 0.6; }
-
-    .device-id { font-weight: 700; font-size: 14px; color: #fff; }
-    .device-type { font-size: 11px; color: #555; margin-top: 2px; }
-
-    .metric-label { font-size: 10px; color: #444; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
-    .metric-value { font-size: 14px; color: #bbb; font-weight: 600; }
-    .metric-value.good { color: #00FF9C; }
-    .metric-value.warn { color: #FFD93D; }
-    .metric-value.bad { color: #FF6B6B; }
+    .metric-value { font-size: 15px; color: #2D3748; font-weight: 600; }
+    .metric-value.good { color: #059669; }
+    .metric-value.warn { color: #D97706; }
+    .metric-value.bad { color: #DC2626; }
 
     .status-badge {
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 700;
@@ -137,62 +214,67 @@ HTML = """
       text-transform: uppercase;
       text-align: center;
     }
-    .status-badge.synced { background: #00FF9C22; color: #00FF9C; border: 1px solid #00FF9C44; }
-    .status-badge.degraded { background: #FFD93D22; color: #FFD93D; border: 1px solid #FFD93D44; }
-    .status-badge.offline { background: #FF6B6B22; color: #FF6B6B; border: 1px solid #FF6B6B44; }
 
-    .section-title {
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: #333;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
+    .status-badge.synced { background: #D1FAE5; color: #065F46; }
+    .status-badge.degraded { background: #FEF3C7; color: #92400E; }
+    .status-badge.offline { background: #FEE2E2; color: #991B1B; }
 
+    /* Log */
     .log-box {
-      margin-top: 32px;
-      padding: 20px;
-      background: #080810;
-      border: 1px solid #1A1A2A;
-      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #DBEAFE;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(59,130,246,0.05);
     }
+
     .log-entry {
-      font-size: 12px;
-      color: #555;
-      padding: 6px 0;
-      border-bottom: 1px solid #0F0F18;
+      font-size: 13px;
+      color: #64748B;
+      padding: 8px 0;
+      border-bottom: 1px solid #F1F5F9;
       line-height: 1.5;
+      font-family: 'DM Sans', monospace;
     }
-    .log-entry .ts { color: #333; margin-right: 12px; }
-    .log-entry.ok .msg { color: #00FF9C; }
-    .log-entry.warn .msg { color: #FFD93D; }
-    .log-entry.err .msg { color: #FF6B6B; }
+
+    .log-entry:last-child { border-bottom: none; }
+    .log-entry .ts { color: #93AECB; margin-right: 12px; font-size: 12px; }
+    .log-entry.ok .msg { color: #059669; font-weight: 500; }
+    .log-entry.warn .msg { color: #D97706; font-weight: 500; }
+    .log-entry.err .msg { color: #DC2626; font-weight: 500; }
   </style>
 </head>
 <body>
+
   <header>
-    <div class="label">Teleoperation Lab · Session Active</div>
-    <h1>Device Validation <span>Dashboard</span></h1>
+    <div>
+      <div class="label">Teleoperation Lab · Session Active</div>
+      <h1>Device Validation <span>Dashboard</span></h1>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      LIVE
+    </div>
   </header>
 
   <div class="session-bar">
-    <div>
+    <div class="stat-card">
       <div class="stat-label">Session ID</div>
-      <div class="stat-value" id="session-id">SES-20250513-001</div>
+      <div class="stat-value" id="session-id" style="font-size:15px;">SES-20250513-001</div>
     </div>
-    <div>
+    <div class="stat-card">
       <div class="stat-label">Devices Online</div>
       <div class="stat-value good" id="devices-online">{{ synced_count }}/{{ total_count }}</div>
     </div>
-    <div>
+    <div class="stat-card">
       <div class="stat-label">Sync Health</div>
       <div class="stat-value {% if sync_health == 'GOOD' %}good{% elif sync_health == 'DEGRADED' %}warn{% else %}bad{% endif %}" id="sync-health">{{ sync_health }}</div>
     </div>
-    <div>
+    <div class="stat-card">
       <div class="stat-label">Avg Drift</div>
       <div class="stat-value {% if avg_drift < 0.01 %}good{% elif avg_drift < 0.02 %}warn{% else %}bad{% endif %}" id="avg-drift">{{ "%.4f"|format(avg_drift) }}s</div>
     </div>
-    <div>
+    <div class="stat-card">
       <div class="stat-label">Session Status</div>
       <div class="stat-value good" id="session-status">RECORDING</div>
     </div>
@@ -243,6 +325,7 @@ HTML = """
     <div class="log-entry err"><span class="ts">[09:14:05]</span><span class="msg">CAM-05 offline. No frames captured. Excluded from session.</span></div>
     <div class="log-entry ok"><span class="ts">[09:14:06]</span><span class="msg">Recording started. 4/5 devices active.</span></div>
   </div>
+
 </body>
 </html>
 """
@@ -265,4 +348,5 @@ def dashboard():
     )
 
 if __name__ == "__main__":
+    print("\n🚀 Dashboard running at: http://127.0.0.1:5000\n")
     app.run(debug=True, port=5000, host="127.0.0.1")
