@@ -1,6 +1,6 @@
 # Device Validation Dashboard & Test Framework
 
-[![Device Validation UI Tests](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml/ui-tests.yml)](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml)
+[![Device Validation UI Tests](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml)
 
 A Selenium-based UI test framework built around a mock teleoperation device monitoring dashboard — modeled after multi-device VR and motion-capture validation work at Tesla.
 
@@ -22,4 +22,18 @@ A Selenium-based UI test framework built around a mock teleoperation device moni
 ## How to Run
 
 **Terminal 1 — start the dashboard:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python run_dashboard.py
+```
 
+**Terminal 2 — run the tests:**
+```bash
+source venv/bin/activate
+pytest tests/ -v
+```
+
+## CI/CD
+Tests run automatically on every push via GitHub Actions using headless Chrome.
