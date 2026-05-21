@@ -1,6 +1,6 @@
 # Device Validation Dashboard & Test Framework
 
-[![Device Validation UI Tests](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml)
+[![Device Validation UI Tests](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml/ui-tests.yml)](https://github.com/nguwinv/device-validation-framework/actions/workflows/ui-tests.yml)
 
 A Selenium-based UI test framework built around a mock teleoperation device monitoring dashboard — modeled after multi-device VR and motion-capture validation work at Tesla.
 
@@ -22,8 +22,4 @@ A Selenium-based UI test framework built around a mock teleoperation device moni
 ## How to Run
 
 **Terminal 1 — start the dashboard:**
-```bash
-git add .
-git commit -m "docs: fix CI badge link"
-git push origin main
-:wq
+
